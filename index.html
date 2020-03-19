@@ -1,47 +1,280 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-<head>
-<title> </title>
-</head> <center> <h1>wellcome to Dallas's web page </h1> </center>
+<head>    <link rel="icon" href="http://bit.ly/2IN6EXf" type="image/png">     
+
+    
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+<style>
+canvas {
+    border:1px solid #d3d3d3;
+    background-color: #f1f1f1;
+}
+</style>
+</head>
+<body onload="startGame()"> <a href="https://dallask8888.github.io/website/">Visit my gethub!</a>
+    
+    <script>
+
+    
+    
+    
+   
+
+    var str = "Hello World!";
+var enc = window.btoa(str);
+var dec = window.atob(enc);
+
+//var res = "Encoded String: " + enc + "<br>" + "Decoded String: " + dec;
+    //alert("This game is still in beta testing. If you experience any bugs please let me know.");
+    
+
+    
+    
+    
+    
+
+var myPlayer;
+var myBackground;
+var myObstacle2;    
+var myObstacle;
+var myObstacles = [];
+var myScore;
+var mySound1;
+var myMusic;
+
+
+function startGame() {
+    
+       
+    
+    myScore = new component("30px", "Consolas", "grey", 280, 40, "text");
+    myObstacle2 = new component(99, 99, "black", 500, 44);
+    myObstacle = new component(99, 99, "red", 400, 229);
+    myBackground = new component(1284, 610, "3.png", 0, 0, "image");
+    myPlayer = new component(25, 60, "0left.png", 44, 730, "image");
+    mySound1 = new sound("death.mp3");
+    myMusic = new sound("7.mp3");
+   
+    myMusic.play();
+
+    myGameArea.start();
+}
+
+var myGameArea = {
+    canvas : document.createElement("canvas"),
+    start : function() {
+        this.canvas.width = 1284;
+        this.canvas.height = 610;
+        this.context = this.canvas.getContext("2d");
+        document.body.insertBefore(this.canvas, document.body.childNodes[0]);
+        this.frameNo = 0;
+        updateGameArea();
+        
+window.addEventListener('keydown', function (e) {
+      myGameArea.keys = (myGameArea.keys || []);
+      myGameArea.keys[e.keyCode] = true;
+    })
+        
+    window.addEventListener('keyup', function (e) {
+            myGameArea.keys[e.keyCode] = (e.type == "keydown");            
+        })
+    }, 
+    clear : function(){
+        this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+}
+
+
+function component(width, height, color, x, y, type) {
+    this.type = type;
+    if (type == "image") {
+    this.image = new Image();
+    this.image.src = color;
+  }
+    this.gamearea = myGameArea;
+    this.score = 0;
+    this.width = width;
+    this.height = height;
+    this.speedX = 0;
+    this.speedY = 0;    
+    this.x = x;
+    this.y = y;
+    this.gravity = 0;
+    this.gravitySpeed = 0;
+    this.bounce = 0.6;
+    this.update = function() {
+        ctx = myGameArea.context;
+        if (this.type == "text") {
+            ctx.font = this.width + " " + this.height;
+            ctx.fillStyle = color;
+            ctx.fillText(this.text, this.x, this.y);
+        } else {
+            if (type == "image") {
+      ctx.drawImage(this.image,
+        this.x,
+        this.y,
+        this.width, this.height);
+    } else {
+	    ctx = myGameArea.context;
+            ctx.fillStyle = color;
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+        }
+    }
+    }
+    this.newPos = function() {
+        this.gravitySpeed += this.gravity;
+        this.x += this.speedX;
+        this.y += this.speedY + this.gravitySpeed;
+        this.hitBottom();
+        this.hitRight();
+        this.hitTop();
+        this.hitLeft();
+    }
+
+    this.hitTop = function() {
+        var rocktop = myGameArea.canvas.height - this.height - 551;
+        if (this.y < rocktop) {
+            this.y = rocktop;
+            this.gravitySpeed = 0;
+        }
+    }
+    
+    this.hitLeft = function() {
+    var rockleft = myGameArea.canvas.width - this.width - 1259;
+    if (this.x < rockleft) {
+      this.x = rockleft;
+        
+    }
+  }
+    
+    this.hitRight = function() {
+    var rockright = myGameArea.canvas.width - this.width;
+    if (this.x > rockright) {
+      this.x = rockright;
+        
+    }
+  }
+    
+    
+    
+    this.hitBottom = function() {
+        var rockbottom = myGameArea.canvas.height - this.height;
+        if (this.y > rockbottom) {
+            this.y = rockbottom;
+          this.gravitySpeed = -(this.gravitySpeed * this.bounce);
+	    
+        }
+    }
+    this.crashWith = function(otherobj) {
+        var myleft = this.x;
+        var myright = this.x + (this.width);
+        var mytop = this.y;
+        var mybottom = this.y + (this.height);
+        var otherleft = otherobj.x;
+        var otherright = otherobj.x + (otherobj.width);
+        var othertop = otherobj.y;
+        var otherbottom = otherobj.y + (otherobj.height);
+        var crash = true;
+        if ((mybottom < othertop) || (mytop > otherbottom) || (myright < otherleft) || (myleft > otherright)) {
+            crash = false;
+        }
+        return crash;
+    }
+}
+
+  function sound(src) {
+  this.sound = document.createElement("audio");
+  this.sound.src = src;
+  this.sound.setAttribute("preload", "auto");
+  this.sound.setAttribute("controls", "none");
+  this.sound.style.display = "none";
+  document.body.appendChild(this.sound);
+  this.play = function(){
+    this.sound.play();
+  }
+  this.stop = function(){
+    this.sound.pause();
+  }
+}
+
+        
+        
+  
+function updateGameArea() { 
+if (myPlayer.crashWith(myObstacle2))  { 
+    mySound1.play();
+    myGameArea.stop();
+                                                              
+                                        
+                                        } else {
+     myGameArea.clear();
+
+    myGameArea.frameNo += 1;                        
+    myPlayer.speedX = 0;
+    myPlayer.speedY = 0;
+    accelerate(0.05)
+    
+    if (myGameArea.keys && myGameArea.keys[87]) {accelerate(-0.2); }                                 // W
+    if (myGameArea.keys && myGameArea.keys[65]) {myPlayer.speedX = -3; }                            // A
+    //if (myGameArea.keys && myGameArea.keys[83]) {myPlayer.speedY = 3; }                          // S
+    if (myGameArea.keys && myGameArea.keys[68]) {myPlayer.speedX = 3; }                           // D
+    if (myGameArea.keys && myGameArea.keys[37]) {myPlayer.speedX = -3; }                         // left
+    if (myGameArea.keys && myGameArea.keys[39]) {myPlayer.speedX = 3; }                         // right
+    if (myGameArea.keys && myGameArea.keys[38]) {accelerate(-0.2); }                           // up
+    //if (myGameArea.keys && myGameArea.keys[40]) {myPlayer.speedY = 3; }                     // down
+    if (myGameArea.keys && myGameArea.keys[32]) {accelerate(-0.2); }                         // Space
+    if (myGameArea.keys && myGameArea.keys[65]) {myPlayer.image.src = "0left.png";}         // A
+    if (myGameArea.keys && myGameArea.keys[68]) {myPlayer.image.src = "0right.png";}       // D
+    if (myGameArea.keys && myGameArea.keys[87]) {}      // W
+    if (myGameArea.keys && myGameArea.keys[83]) {}     // S
+    if (myGameArea.keys && myGameArea.keys[37]) {myPlayer.image.src = "0left.png";}         //left
+    if (myGameArea.keys && myGameArea.keys[39]) {myPlayer.image.src = "0right.png";}       //right
+    if (myGameArea.keys && myGameArea.keys[38]) {}      //up
+    if (myGameArea.keys && myGameArea.keys[40]) {}     //down
+                                      
+       // 2 keys presed                                     
+    document.addEventListener('keydown', function(event) { if (event.code == 'KeyZ' && (event.SpaceKey || event.metaKey)) {  alert('Undo!')  } });                                       
+                                    
+                                            
+                                            
+                                            
+                                            
+                                            
+                                            
+    myGameArea.clear();
+    myObstacle2.update();
+    myObstacle.update();
+    myBackground.update();
+    myScore.text="SCORE: " + myGameArea.frameNo;
+    myScore.update();
+    myPlayer.newPos();
+    myPlayer.update();
+    
+                                        }
+}
+function everyinterval(n) {
+    if ((myGameArea.frameNo / n) % 1 == 0) {return true;}
+    return false;
+}
+
+    
+    
+function accelerate(n) {
+    if (!myGameArea.interval) {myGameArea.interval = setInterval(updateGameArea, 20);}
+
+    myPlayer.gravity = n;
+    
+}
+    
+</script>
 <br>
-<body bgcolor=BCFF0A text=#ffffff "background=myfiles/webk.png">
-<center>
-<img src="webk.jpg" alt="">
-<u>what is up</u>
-
-</center>
-
-<table align="center" border="1" with="300">
-	<tr>
-		<td> The best vids:</td>
-	</tr>
-
-	<tr>
-		<td>
-<iframe width="560" height="315" 							src="https://www.youtube.com/embed/PHgc8Q6qTjc" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>	
-		</td>
-	</tr>
-
-
-<tr>
-	<td>
-
-		<b>Sub to the god</b>
-
-	</td>
-</tr>
-
-
-
-</table>
-
-
-
-
-
-
-
-
 </body>
 
 </html>
+
+
+
+
+
